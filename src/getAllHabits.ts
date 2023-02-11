@@ -2,22 +2,47 @@ import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user";
 
 export async function getAllHabits() {
   try {
+    // get today's date in YYYYMMDD format
+    const today = new Date();
+    const todayYYYYMMDD = today
+      .toISOString()
+      .slice(0, 10)
+      .replace(/-/g, "");
+
+    // get two month before today's date in YYYYMMDD format
+    const twoMonthBefore = new Date();
+    twoMonthBefore.setMonth(twoMonthBefore.getMonth() - 2);
+    const twoMonthBeforeYYYYMMDD = twoMonthBefore
+      .toISOString()
+      .slice(0, 10)
+      .replace(/-/g, "");
     const allHabits = await logseq.DB.datascriptQuery(`
-      [:find (pull ?b [*])
+    [
+        :find (pull ?b [*]) ?name
               :where
-              [?b :block/marker ?marker]
-              [(missing? $ ?b :block/scheduled)]
-              [(contains? #{"TODO" "DONE"} ?marker)]
-              [?b :block/path-refs [:block/name "habit-tracker"]]
-              [?page :block/original-name ?name]]
+              [?b :block/page ?page]
+              [?page :block/journal? true]
+              [?page :block/journal-day ?d]
+              [(>= ?d ${twoMonthBeforeYYYYMMDD})]
+              [(<= ?d ${todayYYYYMMDD})]
+              [?b :block/refs ?refpage]
+              [?refpage :block/properties ?pp]
+              [(get ?pp :tags) ?tags]
+              (or 
+                [(get ?tags "habit") ]
+                [(get ?tags "ongoing🟩") ]
+              )
+              [?refpage :block/name ?name]
+  ]
       `);
 
+    console.log(allHabits);
+
     if (allHabits) {
-      let payload = allHabits.map((a: any) => ({
-        content: a[0].content.substring(5, a[0].content.indexOf("#") - 1),
+      let payload = allHabits.map((a: [BlockEntity, string]) => ({
+        content: a[1],//.content,//.substring(5),
         parentId: a[0].page.id,
         uuid: a[0].uuid,
-        marker: a[0].marker,
       }));
 
       for (let i = 0; i < payload.length; i++) {

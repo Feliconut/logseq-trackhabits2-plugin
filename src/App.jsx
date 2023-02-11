@@ -24,7 +24,7 @@ const Table = ({
             {headerGroup.headers.map((column) => (
               <th {...column.getHeaderProps()} className="tableHeader">
                 <span className="toolTipText">{column.render("Header")}</span>
-                {column.render("Header")}
+                {column.render("Header").split(",")[0].split(" ")[1]}
               </th>
             ))}
           </tr>
@@ -86,7 +86,7 @@ const App = (props) => {
     for (let j of rowArr) {
       if (i.content === j.col1) {
         let payload = {
-          [i.dateName]: i.marker,
+          [i.dateName]: "🟩",
         };
         Object.assign(j, payload);
       }
