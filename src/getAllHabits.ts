@@ -57,6 +57,10 @@ export async function getAllHabits() {
       payload = payload
         // Filters out TODOs on non journal pages
         .filter((a: any) => a.rawDate !== undefined)
+        // Sort by content first letter
+        // .sort((a: BlockEntity, b: BlockEntity) =>
+        //   a.content.localeCompare(b.content)
+        // )
         // Sorts by date
         .sort(
           (a: BlockEntity, b: BlockEntity) =>

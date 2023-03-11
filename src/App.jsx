@@ -80,7 +80,7 @@ const App = (props) => {
   // Get unique habits for each data row
   const rowArr = [...new Set(habitsArr.map((a) => a.content))].map((i) => ({
     col1: i,
-  }));
+  })).sort((a, b) => (a.col1 > b.col1 ? 1 : -1));
 
   for (let i of habitsArr) {
     for (let j of rowArr) {
@@ -111,8 +111,7 @@ const App = (props) => {
       data={data}
       getCellProps={(cellInfo) => ({
         style: {
-          backgroundColor: `${handleBgColour(cellInfo.value)}`,
-          borderRadius: "50%",
+          // borderRadius: "50%",
           border: "1px solid",
           margin: "0",
           padding: "10px 15px",
